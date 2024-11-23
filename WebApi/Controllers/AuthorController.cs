@@ -27,13 +27,13 @@ namespace WebApi.Controllers
         }
 
         // GET: api/<AuthorController>
-        [HttpGet]
+        [HttpGet("GetAllAuthors")]
         public async Task<IActionResult> GetAllAuthors()
         {
             return Ok(await _mediator.Send(new GetAllAuthorsQuery()));
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("GetAuthorById")]
         public async Task <IActionResult> GetAuthorById(Guid authorId)
         {
             return Ok(await _mediator.Send(new GetAuthorByIdQuery(authorId)));
@@ -41,7 +41,7 @@ namespace WebApi.Controllers
         }
 
         // POST api/<AuthorController>
-        [HttpPost]
+        [HttpPost("CreateAuthor")]
         public async Task<IActionResult> CreateAuthor([FromBody] CreateAuthorDto createAuthorDto)
         {
             if (createAuthorDto == null)
@@ -56,13 +56,13 @@ namespace WebApi.Controllers
         
 
         // DELETE api/<AuthorController>/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete("DeleteAuthorById")]
+        public async Task<IActionResult> DeleteAuthorById(Guid id)
         {
             return Ok(await _mediator.Send(new DeleteAuthorCommand(id)));
         }
 
-        [HttpPut("{id:guid}")]
+        [HttpPut("UpdateAuthor")]
         public async Task<IActionResult> UpdateAuthor(Guid id, [FromBody] UpdateAuthorDto updateAuthorDto)
         {
             return Ok(await _mediator.Send(new UpdateAuthorCommand(id, updateAuthorDto)));

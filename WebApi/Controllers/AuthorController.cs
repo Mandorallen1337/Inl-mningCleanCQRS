@@ -10,6 +10,7 @@ using Application.DTOs.AuthorDto;
 using Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,42 +31,80 @@ namespace WebApi.Controllers
         [HttpGet("GetAllAuthors")]
         public async Task<IActionResult> GetAllAuthors()
         {
-            return Ok(await _mediator.Send(new GetAllAuthorsQuery()));
+            try
+            {
+                return Ok(await _mediator.Send(new GetAllAuthorsQuery()));
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
 
         [HttpGet("GetAuthorById")]
-        public async Task <IActionResult> GetAuthorById(Guid authorId)
+        public async Task<IActionResult> GetAuthorById(Guid authorId)
         {
-            return Ok(await _mediator.Send(new GetAuthorByIdQuery(authorId)));
-            
+            try
+            {
+                return Ok(await _mediator.Send(new GetAuthorByIdQuery(authorId)));
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
 
         // POST api/<AuthorController>
         [HttpPost("CreateAuthor")]
         public async Task<IActionResult> CreateAuthor([FromBody] CreateAuthorDto createAuthorDto)
         {
-            if (createAuthorDto == null)
+            try
             {
-                return BadRequest();
+                if (createAuthorDto == null)
+                {
+                    return BadRequest();
+                }
+                var authorToAdd = new Author(createAuthorDto.FirstName, createAuthorDto.LastName);
+                var createdAuthor = await _mediator.Send(new CreateAuthorCommand(authorToAdd));
+                return CreatedAtAction(nameof(GetAuthorById), new { id = createdAuthor.Id }, createdAuthor);
             }
-            var authorToAdd = new Author(createAuthorDto.FirstName, createAuthorDto.LastName);
-            var createdAuthor = await _mediator.Send(new CreateAuthorCommand(authorToAdd));
-            return CreatedAtAction(nameof(GetAuthorById), new { id = createdAuthor.Id }, createdAuthor);
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
 
-        
-
         // DELETE api/<AuthorController>/5
-        [HttpDelete("DeleteAuthorById")]
-        public async Task<IActionResult> DeleteAuthorById(Guid id)
+        [HttpDelete("DeleteAuthor")]
+        public async Task<IActionResult> DeleteAuthor(Guid id)
         {
-            return Ok(await _mediator.Send(new DeleteAuthorCommand(id)));
+            try
+            {
+                return Ok(await _mediator.Send(new DeleteAuthorCommand(id)));
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
 
         [HttpPut("UpdateAuthor")]
         public async Task<IActionResult> UpdateAuthor(Guid id, [FromBody] UpdateAuthorDto updateAuthorDto)
         {
-            return Ok(await _mediator.Send(new UpdateAuthorCommand(id, updateAuthorDto)));
+            try
+            {
+                return Ok(await _mediator.Send(new UpdateAuthorCommand(id, updateAuthorDto)));
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        private IActionResult HandleException(Exception ex)
+        {
+            // Log the exception (not implemented here)
+            return StatusCode((int)HttpStatusCode.InternalServerError, new { error = ex.Message });
         }
     }
 }

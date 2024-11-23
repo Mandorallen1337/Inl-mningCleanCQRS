@@ -23,43 +23,101 @@ namespace WebApi.Controllers
         }
 
         // GET: api/<BookController>
-        [HttpGet]
+        [HttpGet("GetAllBooks")]
         public async Task<ActionResult<List<Book>>> GetAllBooks()
         {
-            return Ok(await _mediator.Send(new GetAllBooksQuery()));
+            try
+            {
+                var books = await _mediator.Send(new GetAllBooksQuery());
+                return Ok(books);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // GET api/<BookController>/5
-        [HttpGet("{id:guid}")]
+        [HttpGet("GetBookById")]
         public async Task<ActionResult<Book>> GetBookById(Guid bookId)
         {
-            return Ok(await _mediator.Send(new GetBookbyIdQuery(bookId)));
+            try
+            {
+                var book = await _mediator.Send(new GetBookbyIdQuery(bookId));
+                if (book == null)
+                {
+                    return NotFound();
+                }
+                return Ok(book);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // POST api/<BookController>
-        [HttpPost]
+        [HttpPost("CreateBook")]
         public async Task<ActionResult<Book>> CreateBook([FromBody] CreateBookDto createBookDto)
         {
             if (createBookDto == null)
             {
-                return BadRequest();
+                return BadRequest("Book data is null.");
             }
-            var bookToadd = new Book(createBookDto.Title, createBookDto.Description);
-            var createdBook = await _mediator.Send(new CreateBookCommand(bookToadd));
-            return CreatedAtAction(nameof(GetBookById), new { id = createdBook.Id }, createdBook);
+
+            try
+            {
+                var bookToAdd = new Book(createBookDto.Title, createBookDto.Description);
+                var createdBook = await _mediator.Send(new CreateBookCommand(bookToAdd));
+                return CreatedAtAction(nameof(GetBookById), new { id = createdBook.Id }, createdBook);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // DELETE api/<BookController>/5
-        [HttpDelete("{id:guid}")]
+        [HttpDelete("DeleteBook")]
         public async Task<ActionResult<List<Book>>> DeleteBook(Guid id)
         {
-            return Ok(await _mediator.Send(new DeleteBookCommand(id)));
+            try
+            {
+                var result = await _mediator.Send(new DeleteBookCommand(id));
+                if (result == null)
+                {
+                    return NotFound();
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
-        [HttpPut("{id:guid}")]
+        [HttpPut("UpdateBook")]
         public async Task<IActionResult> Updatebook(Guid id, [FromBody] UpdateBookDto updateBookDto)
         {
-            return Ok(await _mediator.Send(new UpdateBookCommand(id, updateBookDto)));
+            if (updateBookDto == null)
+            {
+                return BadRequest("Book data is null.");
+            }
+
+            try
+            {
+                var result = await _mediator.Send(new UpdateBookCommand(id, updateBookDto));
+                if (result == null)
+                {
+                    return NotFound();
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
+    
 }

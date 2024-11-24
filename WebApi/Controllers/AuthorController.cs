@@ -9,6 +9,7 @@ using Application.Books.Queries.GetBookById;
 using Application.DTOs.AuthorDto;
 using Domain.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -28,6 +29,7 @@ namespace WebApi.Controllers
         }
 
         // GET: api/<AuthorController>
+        [Authorize]
         [HttpGet("GetAllAuthors")]
         public async Task<IActionResult> GetAllAuthors()
         {

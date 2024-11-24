@@ -11,6 +11,7 @@ namespace Database.Databases
     {
         public List<Book> Books = new List<Book>();
         public List<Author> Authors = new List<Author>();
+        
 
         public FakeDatabase()
         {
@@ -30,7 +31,24 @@ namespace Database.Databases
                     new Author("George", "Orwell"),
                     new Author("J. K.", "Rowling"),
                     new Author("J. D.", "Salinger")
-                });
+                });            
+
         }
+
+        public List<User> Users
+        {
+            get
+            {
+                return allUsers;
+            }
+            set
+            {
+                allUsers = value;
+            }
+        }
+        private static List<User> allUsers = new(){
+            new User{Id = Guid.NewGuid(), UserName = "admin"},
+            new User{Id = Guid.NewGuid(), UserName = "user"}
+        };
     }
 }

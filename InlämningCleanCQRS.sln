@@ -21,9 +21,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookTests", "TestProject\BookTests.csproj", "{A7B73646-7740-41B8-BB0F-0D410CE19DEE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Database\Infrastructure.csproj", "{5C1BEF4E-78D9-4170-90A4-ABF7CD70EF6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database", "Database\Database.csproj", "{5C1BEF4E-78D9-4170-90A4-ABF7CD70EF6C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{E05A5B9F-C4E5-4C2A-8507-533DFFC9A54B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5C1BEF4E-78D9-4170-90A4-ABF7CD70EF6C} = {5C1BEF4E-78D9-4170-90A4-ABF7CD70EF6C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

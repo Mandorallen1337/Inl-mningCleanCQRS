@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{A3EE8B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{4C7590C6-648C-4545-B337-A0F83364128B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{A3A8194E-41E3-46DF-B84E-E6E245B06854}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{A3A8194E-41E3-46DF-B84E-E6E245B06854}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{5AB7D287-6EEA-443F-89B6-CE8DBA883275}"
 EndProject
@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookTests", "TestProject\BookTests.csproj", "{A7B73646-7740-41B8-BB0F-0D410CE19DEE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database", "Database\Database.csproj", "{5C1BEF4E-78D9-4170-90A4-ABF7CD70EF6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Database\Infrastructure.csproj", "{5C1BEF4E-78D9-4170-90A4-ABF7CD70EF6C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{E05A5B9F-C4E5-4C2A-8507-533DFFC9A54B}"
 EndProject

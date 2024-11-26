@@ -14,6 +14,7 @@ namespace WebApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddInfrastruture(builder.Configuration.GetConnectionString("DefaultConnection")!);
 
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
             var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);

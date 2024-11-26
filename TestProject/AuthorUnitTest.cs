@@ -108,5 +108,22 @@ namespace BookTests
             Assert.AreEqual(updateAuthorDto.LastName, authorToUpdate.LastName);
         }
 
+        [Test]
+        public async Task When_UpdateAuthorCommand_Ishandled_withInvalidId_Then_ExceptionIsThrown()
+        {
+            // Arrange
+            var fakeDatabase = new FakeDatabase();
+            var handler = new UpdateAuthorCommandHandler(fakeDatabase);
+            var authorToUpdate = fakeDatabase.Authors.First();
+            var updateAuthorDto = new UpdateAuthorDto
+            {
+                FirstName = "UpdatedFirstName",
+                LastName = "UpdatedLastName"
+            };
+            // Act
+            // no act here for failing test
+            // Assert
+            Assert.ThrowsAsync<Exception>(() => handler.Handle(new UpdateAuthorCommand(Guid.NewGuid(), updateAuthorDto), CancellationToken.None));
+        }
     }
 }

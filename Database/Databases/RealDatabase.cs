@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace Database.Databases
 {
-    public class RealDatabase : DbContext
+    public class RealDatabase(DbContextOptions<RealDatabase> options) : DbContext(options)
     {
-        public DbSet<Book> books { get; set; }
-        public DbSet<Author> authors { get; set; }
-        public DbSet<User> users { get; set; }
+        public DbSet<Book> Books { get; set; }
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<User> Users { get; set; }
 
-        public RealDatabase(DbContextOptions<RealDatabase> options) : base(options)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
+            optionsBuilder.UseSqlServer("Server=DESKTOP-7DUG0J0\\SQLEXPRESS01;Database=MyNewDatabase;Trusted_Connection=True;TrustServerCertificate=true;");
         }
-        
+
     }
 }

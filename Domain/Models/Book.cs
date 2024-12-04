@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Domain.Models
@@ -12,12 +13,17 @@ namespace Domain.Models
         public string? Title { get; set; }
 
         public string? Description { get; set; }
+        public Guid AuthorId { get; set; }
 
-        public Book(string title, string description)
+        [JsonPropertyName("authorDetails")]
+        public Author Author { get; set; }
+
+        public Book(string title, string description, Guid authorId)
         {
             Id = Guid.NewGuid();
             Title = title;
             Description = description;
+            AuthorId = authorId;            
         }
     }
 }

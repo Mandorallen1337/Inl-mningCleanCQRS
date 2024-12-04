@@ -8,6 +8,7 @@ using Application.DTOs.BookDto;
 using Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApi.Controllers
 {
@@ -24,6 +25,7 @@ namespace WebApi.Controllers
 
         // GET: api/<BookController>
         [HttpGet("GetAllBooks")]
+        [ResponseCache(CacheProfileName = "DefaultCache")]
         public async Task<ActionResult<List<Book>>> GetAllBooks()
         {
             try
@@ -58,36 +60,38 @@ namespace WebApi.Controllers
 
         // POST api/<BookController>
         [HttpPost("CreateBook")]
-        public async Task<ActionResult<Book>> CreateBook([FromBody] CreateBookDto createBookDto)
+        public async Task<IActionResult> CreateBook([FromBody] CreateBookCommand createBookCommand)
         {
-            if (createBookDto == null)
+            if (createBookCommand == null)
             {
                 return BadRequest("Book data is null.");
             }
 
             try
             {
-                var bookToAdd = new Book(createBookDto.Title, createBookDto.Description);
-                var createdBook = await _mediator.Send(new CreateBookCommand(bookToAdd));
-                return CreatedAtAction(nameof(GetBookById), new { id = createdBook.Id }, createdBook);
+                var result = await _mediator.Send(createBookCommand);
+                return Ok(result);
             }
-            catch (Exception ex)
+            catch (ValidationException vex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return BadRequest(vex.Message);
             }
         }
 
         // DELETE api/<BookController>/5
         [HttpDelete("DeleteBook")]
-        public async Task<ActionResult<List<Book>>> DeleteBook(Guid id)
+        public async Task<ActionResult<Book>> DeleteBook(Guid id)
         {
             try
-            {
+            {                
                 var result = await _mediator.Send(new DeleteBookCommand(id));
+
                 if (result == null)
                 {
+                    
                     return NotFound();
                 }
+                
                 return Ok(result);
             }
             catch (Exception ex)
@@ -113,10 +117,11 @@ namespace WebApi.Controllers
                 }
                 return Ok(result);
             }
-            catch (Exception ex)
+            catch (ValidationException vex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return BadRequest(vex.Message);
             }
+            
         }
     }
     

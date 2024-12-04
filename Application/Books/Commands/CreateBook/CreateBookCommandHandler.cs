@@ -1,8 +1,13 @@
-﻿using Database.Databases;
+﻿using Application.DTOs.BookDto;
+using Database.Databases;
+using Database.Exceptions;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,23 +16,31 @@ namespace Application.Books.Commands.CreateBook
 {
     public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Book>
     {
-        private readonly FakeDatabase _fakeDatabase;
+        private readonly IGenericRepository<Book> _bookRepository;
 
-        public CreateBookCommandHandler(FakeDatabase fakeDatabase)
+        private readonly IGenericRepository<Author> _authorRepository;
+
+        public CreateBookCommandHandler(IGenericRepository<Book> writeRepository, IGenericRepository<Author> authorRepositary)
         {
-            _fakeDatabase = fakeDatabase;
+            _bookRepository = writeRepository;
+            _authorRepository = authorRepositary;
         }
-        public Task<Book> Handle(CreateBookCommand request, CancellationToken cancellationToken)
+
+        public async Task<Book> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
-            try
+            if(string.IsNullOrEmpty(request.Title))
             {
-                _fakeDatabase.Books.Add(request.NewBook);
+                throw new ValidationException("Title is required");
             }
-            catch
+            if (string.IsNullOrEmpty(request.Description))
             {
-                throw new Exception("Book not added");
-            }            
-            return Task.FromResult(request.NewBook);
+                throw new ValidationException("Description is required");
+            }
+
+            var author = await _authorRepository.FindByAsync(x => x.Id == request.AuthorId) ?? throw new NotFoundException("Author not found");
+            var book = new Book(request.Title, request.Description, request.AuthorId);
+            await _bookRepository.AddAsync(book);
+            return book;
         }
     }
 }

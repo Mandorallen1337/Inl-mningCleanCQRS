@@ -1,5 +1,6 @@
 ﻿using Database.Databases;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,21 +12,21 @@ namespace Application.Authors.Queries.GetAuthorById
 {
     public class GetAuthorByIdQueryHandler : IRequestHandler<GetAuthorByIdQuery, Author>
     {
-        private readonly FakeDatabase _fakeDatabase;
+        private readonly IGenericRepository<Author> _genericRepository;
 
-        public GetAuthorByIdQueryHandler(FakeDatabase fakeDatabase)
+        public GetAuthorByIdQueryHandler(IGenericRepository<Author> genericRepository)
         {
-            _fakeDatabase = fakeDatabase;
+            _genericRepository = genericRepository;
         }
 
-        public Task<Author> Handle(GetAuthorByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Author> Handle(GetAuthorByIdQuery request, CancellationToken cancellationToken)
         {
-            var foundAuthor = _fakeDatabase.Authors.FirstOrDefault(author => author.Id == request.AuthorId);
+            var foundAuthor = await _genericRepository.GetByIdAsync(request.AuthorId);
             if (foundAuthor == null)
             {
                 throw new Exception($"Author not found {request.AuthorId}");
             }
-            return Task.FromResult(foundAuthor);
+            return foundAuthor;
         }
     }
 }

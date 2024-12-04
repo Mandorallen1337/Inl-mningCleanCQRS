@@ -1,5 +1,7 @@
 ﻿using Database.Databases;
+using Database.Exceptions;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,25 +13,18 @@ namespace Application.Authors.Commands.DeleteAuthor
 {
     public class DeleteAuthorCommandHandler : IRequestHandler<DeleteAuthorCommand, Author>
     {
-        private readonly FakeDatabase _fakeDatabase;
+        private readonly IGenericRepository<Author> _genericRepository;
 
-        public DeleteAuthorCommandHandler(FakeDatabase fakeDatabase)
+        public DeleteAuthorCommandHandler(IGenericRepository<Author> genericRepository)
         {
-            _fakeDatabase = fakeDatabase;
+            _genericRepository = genericRepository;
         }
 
-        public Task<Author> Handle(DeleteAuthorCommand request, CancellationToken cancellationToken)
+        public async Task<Author> Handle(DeleteAuthorCommand request, CancellationToken cancellationToken)
         {
-            var authorToDelete = _fakeDatabase.Authors.FirstOrDefault(x => x.Id == request.AuthorId);
-            if (authorToDelete == null)
-            {
-                throw new Exception($"Author not found {request.AuthorId}");
-            }
-            else
-            {
-                _fakeDatabase.Authors.Remove(authorToDelete);
-                return Task.FromResult(authorToDelete);
-            }
+            Author authorToDelete = await _genericRepository.GetByIdAsync(request.AuthorId) ?? throw new NotFoundException($"Author not found {request.AuthorId}");
+            await _genericRepository.DeleteAsync(authorToDelete);
+            return authorToDelete;                      
         }
     }
 }

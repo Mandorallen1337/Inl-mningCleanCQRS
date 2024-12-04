@@ -22,6 +22,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("GetAllUsers")]
+        [ResponseCache(CacheProfileName = "DefaultCache")]
         public async Task<IActionResult> GetAllUsers()
         {
             try

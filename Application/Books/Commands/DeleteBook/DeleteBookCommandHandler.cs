@@ -1,5 +1,6 @@
 ﻿using Database.Databases;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,23 +12,27 @@ namespace Application.Books.Commands.DeleteBook
 {
     public class DeleteBookCommandHandler : IRequestHandler<DeleteBookCommand, Book>
     {
-        private readonly FakeDatabase _fakeDatabase;
+        private readonly IGenericRepository<Book> _genericRepository;
 
-        public DeleteBookCommandHandler(FakeDatabase fakeDatabase)
+        public DeleteBookCommandHandler(IGenericRepository<Book> genericRepository)
         {
-            _fakeDatabase = fakeDatabase;
+            _genericRepository = genericRepository;
         }
-        public Task<Book> Handle(DeleteBookCommand request, CancellationToken cancellationToken)
+
+
+        public async Task<Book> Handle(DeleteBookCommand request, CancellationToken cancellationToken)
         {
-            var bookToDelete = _fakeDatabase.Books.FirstOrDefault(x => x.Id == request.BookId);
-            if (bookToDelete == null)
+            try
             {
-                throw new Exception($"Book not found {request.BookId}");
-            }           
-            
-            _fakeDatabase.Books.Remove(bookToDelete);
-            
-            return Task.FromResult(bookToDelete);
+                var bookToDelete = await _genericRepository.GetByIdAsync(request.BookId) ?? throw new Exception($"Book not found {request.BookId}");
+                await _genericRepository.DeleteAsync(bookToDelete);
+                
+                return bookToDelete;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Error deleting book: {ex.Message}", ex);
+            }
         }
     }
 }

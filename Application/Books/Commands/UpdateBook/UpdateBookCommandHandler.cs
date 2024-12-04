@@ -1,5 +1,6 @@
 ﻿using Database.Databases;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -10,26 +11,30 @@ using System.Threading.Tasks;
 namespace Application.Books.Commands.UpdateBook
 {
     public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Book>
-    {
-        FakeDatabase _fakeDatabase;
+    {        
+        private readonly IGenericRepository<Book> _genericRepository;
 
-        public UpdateBookCommandHandler(FakeDatabase fakeDatabase)
+        public UpdateBookCommandHandler(IGenericRepository<Book> genericRepository)
         {
-            _fakeDatabase = fakeDatabase;
+            _genericRepository = genericRepository;
         }
-        public Task<Book> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
+
+        public async Task<Book> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
         {
-            var bookToUpdate = _fakeDatabase.Books.FirstOrDefault(x => x.Id == request.BookId);
-            if (bookToUpdate == null)
+            try
             {
-                throw new Exception($"Book not found {request.BookId}");
+                var booktoUpdate = await _genericRepository.GetByIdAsync(request.BookId) ?? throw new Exception($"Book not found {request.BookId}");
+                booktoUpdate.Title = request.UpdateBookDto.Title;
+                booktoUpdate.Description = request.UpdateBookDto.Description;
+
+                await _genericRepository.UpdateAsync(booktoUpdate);
+                return booktoUpdate;
             }
-            else
+            catch (Exception ex)
             {
-                bookToUpdate.Title = request.UpdateBookDto.Title;                
-                bookToUpdate.Description = request.UpdateBookDto.Description;                
-                return Task.FromResult(bookToUpdate);
+                throw new Exception($"Error updating book: {ex.Message}", ex);
             }
+
         }
     }
 }

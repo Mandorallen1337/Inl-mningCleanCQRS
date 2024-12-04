@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using Database.Databases;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -12,26 +13,21 @@ namespace Application.Authors.Commands.UpdateAuthor
 {
     public class UpdateAuthorCommandHandler : IRequestHandler<UpdateAuthorCommand, Author>
     {
-        private readonly FakeDatabase _fakeDatabase;
+        private readonly IGenericRepository<Author> _genericRepository;
 
-        public UpdateAuthorCommandHandler(FakeDatabase fakeDatabase)
+        public UpdateAuthorCommandHandler(IGenericRepository<Author> genericRepository)
         {
-            _fakeDatabase = fakeDatabase;
+            _genericRepository = genericRepository;
         }
 
-        public Task<Author> Handle(UpdateAuthorCommand request, CancellationToken cancellationToken)
+        public async Task<Author> Handle(UpdateAuthorCommand request, CancellationToken cancellationToken)
         {
-            var authorToUpdate = _fakeDatabase.Authors.FirstOrDefault(x => x.Id == request.AuthorId);
-            if (authorToUpdate == null)
-            {
-                throw new Exception("Author not found");
-            }
-            else
-            {
-                authorToUpdate.FirstName = request.UpdateAuthorDto.FirstName;
-                authorToUpdate.LastName = request.UpdateAuthorDto.LastName;
-                return Task.FromResult(authorToUpdate);
-            }
+            var authorToUpdate = await _genericRepository.GetByIdAsync(request.AuthorId) ?? throw new Exception("Author not found");
+            authorToUpdate.FirstName = request.UpdateAuthorDto.FirstName;
+            authorToUpdate.LastName = request.UpdateAuthorDto.LastName;
+            await _genericRepository.UpdateAsync(authorToUpdate);
+            return authorToUpdate;
+            
         }
     }
 }

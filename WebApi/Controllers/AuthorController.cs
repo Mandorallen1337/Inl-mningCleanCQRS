@@ -29,8 +29,9 @@ namespace WebApi.Controllers
         }
 
         // GET: api/<AuthorController>
-        [Authorize]
+        //[Authorize]
         [HttpGet("GetAllAuthors")]
+        [ResponseCache(CacheProfileName = "DefaultCache")]
         public async Task<IActionResult> GetAllAuthors()
         {
             try
@@ -64,11 +65,10 @@ namespace WebApi.Controllers
             {
                 if (createAuthorDto == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Author data is null.");
                 }
-                var authorToAdd = new Author(createAuthorDto.FirstName, createAuthorDto.LastName);
-                var createdAuthor = await _mediator.Send(new CreateAuthorCommand(authorToAdd));
-                return CreatedAtAction(nameof(GetAuthorById), new { id = createdAuthor.Id }, createdAuthor);
+                var createdAuthor = await _mediator.Send(new CreateAuthorCommand(createAuthorDto));
+                return CreatedAtAction(nameof(GetAuthorById), new { authorId = createdAuthor.Id }, createdAuthor);
             }
             catch (Exception ex)
             {
@@ -76,8 +76,8 @@ namespace WebApi.Controllers
             }
         }
 
-        // DELETE api/<AuthorController>/5
-        [HttpDelete("DeleteAuthor")]
+            // DELETE api/<AuthorController>/5
+            [HttpDelete("DeleteAuthor")]
         public async Task<IActionResult> DeleteAuthor(Guid id)
         {
             try

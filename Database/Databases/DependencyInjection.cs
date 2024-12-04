@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,15 @@ namespace Database.Databases
     {
         public static IServiceCollection AddInfrastruture(this IServiceCollection services, string connectionString)
         {
-            services.AddSingleton<FakeDatabase>();
+            
             services.AddDbContext<RealDatabase>(options =>
             {
-                options.UseSqlServer(connectionString);
-        });
+                options.UseSqlServer(connectionString);                 
+            });
+            // Registrera generiska repository
+            
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
             return services;
         }
     }

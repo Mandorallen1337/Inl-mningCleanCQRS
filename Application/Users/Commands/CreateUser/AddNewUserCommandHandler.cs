@@ -1,5 +1,6 @@
 ﻿using Database.Databases;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,30 +12,28 @@ namespace Application.Users.Commands.CreateUser
 {
     internal class AddNewUserCommandHandler : IRequestHandler<AddNewUserCommand, User>
     {
-        private readonly FakeDatabase _fakeDatabase;
+        private readonly IGenericRepository<User> _genericRepository;
 
-        public AddNewUserCommandHandler(FakeDatabase fakeDatabase)
+        public AddNewUserCommandHandler(IGenericRepository<User> genericRepository)
         {
-            _fakeDatabase = fakeDatabase;
+            _genericRepository = genericRepository;
         }
 
-        public Task<User> Handle(AddNewUserCommand request, CancellationToken cancellationToken)
-        {
-            try
-            {                
-                User userToCreate = new User
-                {
-                    Id = Guid.NewGuid(),
-                    UserName = request.UserDto.UserName,
-                    Password = request.UserDto.Password
-                };
-                _fakeDatabase.Users.Add(userToCreate);
-                return Task.FromResult(userToCreate);
-            }
-            catch
+        public async Task<User> Handle(AddNewUserCommand request, CancellationToken cancellationToken)
+        {        
+            if (string.IsNullOrWhiteSpace(request.UserDto.UserName) || string.IsNullOrWhiteSpace(request.UserDto.Password))
             {
-                throw new Exception("User not added");
+                throw new ArgumentException("User's username and password are required.");
             }
+             User userToCreate = new User
+             {
+                 Id = Guid.NewGuid(),
+                 UserName = request.UserDto.UserName,
+                 Password = request.UserDto.Password
+             };
+             await _genericRepository.AddAsync(userToCreate);
+             return userToCreate;                      
+            
         }
             
         

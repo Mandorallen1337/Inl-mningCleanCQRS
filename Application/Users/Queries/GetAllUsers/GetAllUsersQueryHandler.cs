@@ -1,5 +1,6 @@
 ﻿using Database.Databases;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,25 +12,19 @@ namespace Application.Users.Queries.GetAllUsers
 {
     public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, List<User>>
     {
-        private readonly FakeDatabase _fakeDatabase;
+        private readonly IGenericRepository<User> _genericRepository;
 
-        public GetAllUsersQueryHandler(FakeDatabase fakeDatabase)
+        public GetAllUsersQueryHandler(IGenericRepository<User> genericRepository)
         {
-            _fakeDatabase = fakeDatabase;
-        }
-        public Task<List<User>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                List<User> allUsersFormFakeDatabase = _fakeDatabase.Users;
-                return Task.FromResult(allUsersFormFakeDatabase);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            _genericRepository = genericRepository;
         }
 
-        
+        public async Task<List<User>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+        {
+            var allUsers = await _genericRepository.GetAllAsync();
+            return allUsers == null ? throw new Exception("No users found") : allUsers.ToList();
+        }
+
+
     }
 }

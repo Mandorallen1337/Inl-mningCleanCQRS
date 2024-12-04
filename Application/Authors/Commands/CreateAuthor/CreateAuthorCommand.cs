@@ -12,18 +12,15 @@ namespace Application.Authors.Commands.CreateAuthor
 {
     public class CreateAuthorCommand : IRequest<Author>
     {
-        private CreateAuthorDto createAuthorDto;
-
-        public CreateAuthorCommand(Author authorToAdd)
-        {
-            NewAuthor = authorToAdd;
-        }
+        public CreateAuthorDto CreateAuthorDto;
 
         public CreateAuthorCommand(CreateAuthorDto createAuthorDto)
         {
-            this.createAuthorDto = createAuthorDto;
+            CreateAuthorDto = createAuthorDto;            
         }
 
         public Author NewAuthor { get; }
+
+
     }
 }

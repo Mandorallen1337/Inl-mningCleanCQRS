@@ -1,5 +1,7 @@
 ﻿using Database.Databases;
+using Database.Exceptions;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,24 +13,24 @@ namespace Application.Authors.Commands.CreateAuthor
 {
     public class CreateAuthorcommandHandler : IRequestHandler<CreateAuthorCommand, Author>
     {
-        private readonly FakeDatabase _fakeDatabase;
+        private readonly IGenericRepository<Author> _genericRepository;
 
-        public CreateAuthorcommandHandler(FakeDatabase database)
+        public CreateAuthorcommandHandler(IGenericRepository<Author> genericRepository)
         {
-            _fakeDatabase = database;
+            _genericRepository = genericRepository;
         }
+
 
         public async Task<Author> Handle(CreateAuthorCommand request, CancellationToken cancellationToken)
         {
-            try
+            if (string.IsNullOrEmpty(request.CreateAuthorDto.FirstName) || 
+                string.IsNullOrEmpty(request.CreateAuthorDto.LastName))
             {
-                _fakeDatabase.Authors.Add(request.NewAuthor);
-                return await Task.FromResult(request.NewAuthor);
+                throw new Exception("First name and last name are required");
             }
-            catch
-            {
-                throw new Exception("Author not added");
-            }
+            var newAuthor = new Author(request.CreateAuthorDto.FirstName, request.CreateAuthorDto.LastName);
+            await _genericRepository.AddAsync(newAuthor);
+            return newAuthor;
         }
     }
 }

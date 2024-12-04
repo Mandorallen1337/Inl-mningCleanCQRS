@@ -1,6 +1,8 @@
 using Application;
+using Application.Users.Queries.LoginUser.Helpers;
 using Database.Databases;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -15,6 +17,16 @@ namespace WebApi
 
             // Add services to the container.
             builder.Services.AddInfrastruture(builder.Configuration.GetConnectionString("DefaultConnection")!);
+            builder.Services.AddControllers(options =>
+            {
+                options.CacheProfiles.Add("DefaultCache",
+                    new CacheProfile()
+                    {
+                        Duration = 60,
+                        Location = ResponseCacheLocation.Any
+                    });
+            }); 
+            builder.Services.AddMemoryCache();
 
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
             var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
@@ -44,6 +56,7 @@ namespace WebApi
                 });
             });
 
+            builder.Services.AddSingleton<TokenHelper>();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Johnny Fernelid", Version = "v1" });
@@ -71,7 +84,7 @@ namespace WebApi
             });
 
 
-            builder.Services.AddControllers();
+            
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

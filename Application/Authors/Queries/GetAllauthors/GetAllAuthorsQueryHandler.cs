@@ -1,6 +1,8 @@
 ﻿using Database.Databases;
 using Domain.Models;
+using Domain.Repositories;
 using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,23 +13,25 @@ namespace Application.Authors.Queries.GetAllauthors
 {
     public class GetAllAuthorsQueryHandler : IRequestHandler<GetAllAuthorsQuery, List<Author>>
     {
-        FakeDatabase _fakeDatabase;
+        private readonly IGenericRepository<Author> _genericRepository;
+        private readonly IMemoryCache _memoryCache;
+        private const string cacheKey = "allAuthors";
 
-        public GetAllAuthorsQueryHandler(FakeDatabase fakeDatabase)
+        public GetAllAuthorsQueryHandler(IGenericRepository<Author> genericRepository, IMemoryCache memoryCache)
         {
-            _fakeDatabase = fakeDatabase;
+            _genericRepository = genericRepository;
+            _memoryCache = memoryCache;
         }
 
-        public Task<List<Author>> Handle(GetAllAuthorsQuery request, CancellationToken cancellationToken)
+        public async Task<List<Author>> Handle(GetAllAuthorsQuery request, CancellationToken cancellationToken)
         {
-            try
+            if (!_memoryCache.TryGetValue(cacheKey, out List<Author> allAuthors))
             {
-                return Task.FromResult(_fakeDatabase.Authors);
+                allAuthors = (await _genericRepository.GetAllAsync()).ToList();
+                _memoryCache.Set(cacheKey, allAuthors, TimeSpan.FromMinutes(5));
             }
-            catch
-            {
-                throw new Exception("Authors not found");
-            }
+            
+            return allAuthors == null ? throw new Exception("No authors found") : allAuthors.ToList();
         }
     }
 }

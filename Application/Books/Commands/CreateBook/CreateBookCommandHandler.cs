@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Commands.CreateBook
 {
-    public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Book>
+    public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, OperationResult<Book>>
     {
         private readonly IGenericRepository<Book> _bookRepository;
 
@@ -26,21 +26,30 @@ namespace Application.Books.Commands.CreateBook
             _authorRepository = authorRepositary;
         }
 
-        public async Task<Book> Handle(CreateBookCommand request, CancellationToken cancellationToken)
+        public async Task <OperationResult<Book>> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
-            if(string.IsNullOrEmpty(request.Title))
+            if(string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Description))
             {
-                throw new ValidationException("Title is required");
-            }
-            if (string.IsNullOrEmpty(request.Description))
-            {
-                throw new ValidationException("Description is required");
-            }
+                return OperationResult<Book>.FailureResult("Title and Description is requierd");
+            }            
 
-            var author = await _authorRepository.FindByAsync(x => x.Id == request.AuthorId) ?? throw new NotFoundException("Author not found");
-            var book = new Book(request.Title, request.Description, request.AuthorId);
-            await _bookRepository.AddAsync(book);
-            return book;
+            var author = await _authorRepository.FindByAsync(x => x.Id == request.AuthorId);
+            if (author == null)
+            {
+                return OperationResult<Book>.FailureResult("Author not found");
+            }
+            try
+            {
+                var book = new Book(request.Title, request.Description, request.AuthorId);
+                await _bookRepository.AddAsync(book);
+                return OperationResult<Book>.SuccessResult(book);
+            }
+            catch (Exception)
+            {
+                // Log error here
+                return OperationResult<Book>.FailureResult("Error while creating book");
+            }
+            
         }
     }
 }

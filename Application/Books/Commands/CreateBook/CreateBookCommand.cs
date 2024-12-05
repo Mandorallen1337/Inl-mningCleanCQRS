@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Commands.CreateBook
 {
-    public class CreateBookCommand : IRequest<Book>
+    public class CreateBookCommand : IRequest <OperationResult<Book>>
     {
         public string Title { get; set; }
         public string Description { get; set; }

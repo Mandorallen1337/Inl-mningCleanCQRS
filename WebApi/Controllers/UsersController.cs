@@ -27,7 +27,12 @@ namespace WebApi.Controllers
         {
             try
             {
-                return Ok(await _mediator.Send(new GetAllUsersQuery()));
+                var getAllUsers = await _mediator.Send(new GetAllUsersQuery());
+                if (getAllUsers.IsSuccess)
+                {
+                    return Ok(new { message = getAllUsers.Message, data = getAllUsers.Data });
+                }
+                return BadRequest(new { message = getAllUsers.Message, getAllUsers.ErrorMessage });                
             }
             catch (Exception ex)
             {
@@ -37,11 +42,17 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("RegisterUser")]
-        public async Task<IActionResult> RegisterUser([FromBody] UserDto NewUser)
+        public async Task<IActionResult> RegisterUser([FromBody] UserDto newUser)
         {
             try
             {
-                return Ok(await _mediator.Send(new AddNewUserCommand(NewUser)));
+                var user = await _mediator.Send(new AddNewUserCommand(newUser));
+
+                if (user.IsSuccess)
+                {
+                    return Ok(new { message = user.Message, data = user.Data });
+                }
+                return BadRequest(new { message = user.Message, user.ErrorMessage });
             }
             catch (Exception ex)
             {
@@ -54,7 +65,12 @@ namespace WebApi.Controllers
         {
             try
             {
-                return Ok(await _mediator.Send(new LoginUserQuery(userWantingtoLogin)));
+                var user = await _mediator.Send(new LoginUserQuery(userWantingtoLogin));
+                if (user.IsSuccess)
+                {
+                    return Ok(new { message = user.Message, data = user.Data });
+                }
+                return BadRequest(new { message = user.Message, user.ErrorMessage });
             }
             catch (Exception ex)
             {

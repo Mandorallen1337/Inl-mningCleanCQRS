@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Queries.GetAllBooks
 {
-    public class GetAllBooksQuery : IRequest<List<Book>>
+    public class GetAllBooksQuery : IRequest<OperationResult<List<Book>>>
     {
 
     }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Users.Commands.CreateUser
 {
-    internal class AddNewUserCommandHandler : IRequestHandler<AddNewUserCommand, User>
+    internal class AddNewUserCommandHandler : IRequestHandler<AddNewUserCommand, OperationResult<User>>
     {
         private readonly IGenericRepository<User> _genericRepository;
 
@@ -19,11 +19,11 @@ namespace Application.Users.Commands.CreateUser
             _genericRepository = genericRepository;
         }
 
-        public async Task<User> Handle(AddNewUserCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult<User>> Handle(AddNewUserCommand request, CancellationToken cancellationToken)
         {        
             if (string.IsNullOrWhiteSpace(request.UserDto.UserName) || string.IsNullOrWhiteSpace(request.UserDto.Password))
             {
-                throw new ArgumentException("User's username and password are required.");
+                return OperationResult<User>.FailureResult("Username and password are required");
             }
              User userToCreate = new User
              {
@@ -32,7 +32,7 @@ namespace Application.Users.Commands.CreateUser
                  Password = request.UserDto.Password
              };
              await _genericRepository.AddAsync(userToCreate);
-             return userToCreate;                      
+             return OperationResult<User>.SuccessResult(userToCreate);                     
             
         }
             

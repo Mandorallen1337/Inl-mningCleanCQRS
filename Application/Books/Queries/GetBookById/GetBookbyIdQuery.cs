@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Queries.GetBookById
 {
-    public class GetBookbyIdQuery : IRequest<Book>
+    public class GetBookbyIdQuery : IRequest<OperationResult<Book>>
     {
         public GetBookbyIdQuery(Guid bookId)
         {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Queries.GetAuthorById
 {
-    public class GetAuthorByIdQuery : IRequest<Author>
+    public class GetAuthorByIdQuery : IRequest<OperationResult<Author>>
     {
         public GetAuthorByIdQuery(Guid authorId)
         {

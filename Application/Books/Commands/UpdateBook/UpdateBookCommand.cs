@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Commands.UpdateBook
 {
-    public class UpdateBookCommand : IRequest<Book>
+    public class UpdateBookCommand : IRequest <OperationResult<Book>>
     {
         public Guid BookId { get; set; }
         public UpdateBookDto UpdateBookDto { get; }

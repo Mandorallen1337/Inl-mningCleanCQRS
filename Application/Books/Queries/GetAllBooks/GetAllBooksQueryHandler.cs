@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Books.Queries.GetAllBooks
 {
-    public class GetAllBooksQueryHandler : IRequestHandler<GetAllBooksQuery, List<Book>>
+    public class GetAllBooksQueryHandler : IRequestHandler<GetAllBooksQuery, OperationResult<List<Book>>>
     {
         private readonly IGenericRepository<Book> _genericRepository;
 
@@ -13,18 +13,18 @@ namespace Application.Books.Queries.GetAllBooks
         {
             _genericRepository = genericRepository;
         }
-        public async Task<List<Book>> Handle(GetAllBooksQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<List<Book>>> Handle(GetAllBooksQuery request, CancellationToken cancellationToken)
         {
             
              var books = await _genericRepository.GetAllAsync();
              if (books == null || !books.Any())
              {
-                 throw new KeyNotFoundException("No books found.");
-             }
+                return OperationResult<List<Book>>.FailureResult("No books found");
+            }
 
-             return books.ToList();
-            
-            
+             return OperationResult<List<Book>>.SuccessResult(books.ToList());
+
+
         }
     }
 }

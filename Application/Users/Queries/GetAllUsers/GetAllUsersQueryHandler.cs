@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Users.Queries.GetAllUsers
 {
-    public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, List<User>>
+    public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, OperationResult<List<User>>>
     {
         private readonly IGenericRepository<User> _genericRepository;
 
@@ -19,12 +19,14 @@ namespace Application.Users.Queries.GetAllUsers
             _genericRepository = genericRepository;
         }
 
-        public async Task<List<User>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<List<User>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
         {
             var allUsers = await _genericRepository.GetAllAsync();
-            return allUsers == null ? throw new Exception("No users found") : allUsers.ToList();
+            if (allUsers == null)
+            {
+                return OperationResult<List<User>>.FailureResult("No users found");
+            }
+            return OperationResult<List<User>>.SuccessResult(allUsers.ToList());
         }
-
-
     }
 }

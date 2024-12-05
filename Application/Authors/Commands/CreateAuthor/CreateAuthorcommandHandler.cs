@@ -1,4 +1,5 @@
-﻿using Database.Databases;
+﻿using Application.DTOs.AuthorDto;
+using Database.Databases;
 using Database.Exceptions;
 using Domain.Models;
 using Domain.Repositories;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Commands.CreateAuthor
 {
-    public class CreateAuthorcommandHandler : IRequestHandler<CreateAuthorCommand, Author>
+    public class CreateAuthorcommandHandler : IRequestHandler<CreateAuthorCommand, OperationResult<Author>>
     {
         private readonly IGenericRepository<Author> _genericRepository;
 
@@ -20,17 +21,16 @@ namespace Application.Authors.Commands.CreateAuthor
             _genericRepository = genericRepository;
         }
 
-
-        public async Task<Author> Handle(CreateAuthorCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult<Author>> Handle(CreateAuthorCommand request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(request.CreateAuthorDto.FirstName) || 
+            if (string.IsNullOrEmpty(request.CreateAuthorDto.FirstName) ||
                 string.IsNullOrEmpty(request.CreateAuthorDto.LastName))
             {
-                throw new Exception("First name and last name are required");
+                return OperationResult<Author>.FailureResult("First name and last name are required");
             }
             var newAuthor = new Author(request.CreateAuthorDto.FirstName, request.CreateAuthorDto.LastName);
             await _genericRepository.AddAsync(newAuthor);
-            return newAuthor;
+            return OperationResult<Author>.SuccessResult(newAuthor);
         }
     }
 }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Commands.DeleteBook
 {
-    public class DeleteBookCommandHandler : IRequestHandler<DeleteBookCommand, Book>
+    public class DeleteBookCommandHandler : IRequestHandler<DeleteBookCommand, OperationResult<Book>>
     {
         private readonly IGenericRepository<Book> _genericRepository;
 
@@ -20,18 +20,24 @@ namespace Application.Books.Commands.DeleteBook
         }
 
 
-        public async Task<Book> Handle(DeleteBookCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult<Book>> Handle(DeleteBookCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var bookToDelete = await _genericRepository.GetByIdAsync(request.BookId) ?? throw new Exception($"Book not found {request.BookId}");
+                var bookToDelete = await _genericRepository.GetByIdAsync(request.BookId);
+                if (bookToDelete == null)
+                {
+                    return OperationResult<Book>.FailureResult("Book not found");
+                }
+
                 await _genericRepository.DeleteAsync(bookToDelete);
                 
-                return bookToDelete;
+                return OperationResult<Book>.SuccessResult(bookToDelete);
             }
             catch(Exception ex)
             {
-                throw new Exception($"Error deleting book: {ex.Message}", ex);
+                // Log error
+                return OperationResult<Book>.FailureResult("Error while deleting book");
             }
         }
     }

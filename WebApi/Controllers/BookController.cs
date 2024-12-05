@@ -30,11 +30,19 @@ namespace WebApi.Controllers
         {
             try
             {
-                var books = await _mediator.Send(new GetAllBooksQuery());
-                return Ok(books);
+                var operationResult = await _mediator.Send(new GetAllBooksQuery());
+                if (operationResult.IsSuccess)
+                {
+                    return Ok(new { message = operationResult.Message, data = operationResult.Data });
+                }
+                else
+                {
+                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                }
             }
             catch (Exception ex)
             {
+                // Log error
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -45,12 +53,12 @@ namespace WebApi.Controllers
         {
             try
             {
-                var book = await _mediator.Send(new GetBookbyIdQuery(bookId));
-                if (book == null)
+                var foundBook = await _mediator.Send(new GetBookbyIdQuery(bookId));
+                if (foundBook.IsSuccess)
                 {
-                    return NotFound();
+                    return Ok(new { message = foundBook.Message, data = foundBook.Data });
                 }
-                return Ok(book);
+                return BadRequest(foundBook.ErrorMessage);
             }
             catch (Exception ex)
             {
@@ -62,20 +70,19 @@ namespace WebApi.Controllers
         [HttpPost("CreateBook")]
         public async Task<IActionResult> CreateBook([FromBody] CreateBookCommand createBookCommand)
         {
-            if (createBookCommand == null)
-            {
-                return BadRequest("Book data is null.");
-            }
-
             try
             {
-                var result = await _mediator.Send(createBookCommand);
-                return Ok(result);
+                var newbook = await _mediator.Send(createBookCommand);
+                if(newbook.IsSuccess)
+                {
+                    return Ok(new { message = newbook.Message, data = newbook.Data });
+                }
+                return BadRequest(new { message = newbook.Message, newbook.ErrorMessage });
             }
-            catch (ValidationException vex)
+            catch (Exception)
             {
-                return BadRequest(vex.Message);
-            }
+                return StatusCode(500, "Internal server error");
+            }            
         }
 
         // DELETE api/<BookController>/5
@@ -84,15 +91,15 @@ namespace WebApi.Controllers
         {
             try
             {                
-                var result = await _mediator.Send(new DeleteBookCommand(id));
+                var booktodelete = await _mediator.Send(new DeleteBookCommand(id));
 
-                if (result == null)
+                if (booktodelete.IsSuccess)
                 {
                     
-                    return NotFound();
+                    return Ok(new { message = booktodelete.Message, data = booktodelete.Data });
                 }
                 
-                return Ok(result);
+                return BadRequest(new { message = booktodelete.Message, booktodelete.ErrorMessage });
             }
             catch (Exception ex)
             {
@@ -102,24 +109,19 @@ namespace WebApi.Controllers
 
         [HttpPut("UpdateBook")]
         public async Task<IActionResult> Updatebook(Guid id, [FromBody] UpdateBookDto updateBookDto)
-        {
-            if (updateBookDto == null)
-            {
-                return BadRequest("Book data is null.");
-            }
-
+        {            
             try
             {
-                var result = await _mediator.Send(new UpdateBookCommand(id, updateBookDto));
-                if (result == null)
+                var updateBook = await _mediator.Send(new UpdateBookCommand(id, updateBookDto));
+                if (updateBook.IsSuccess)
                 {
-                    return NotFound();
+                    return Ok(new { message = updateBook.Message, data = updateBook.Data });
                 }
-                return Ok(result);
+                return BadRequest(new { message = updateBook.Message, updateBook.ErrorMessage });
             }
-            catch (ValidationException vex)
+            catch (Exception ex)
             {
-                return BadRequest(vex.Message);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
             
         }

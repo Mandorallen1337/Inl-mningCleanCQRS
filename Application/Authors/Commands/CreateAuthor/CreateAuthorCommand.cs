@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Commands.CreateAuthor
 {
-    public class CreateAuthorCommand : IRequest<Author>
+    public class CreateAuthorCommand : IRequest<OperationResult<Author>>
     {
         public CreateAuthorDto CreateAuthorDto;
 

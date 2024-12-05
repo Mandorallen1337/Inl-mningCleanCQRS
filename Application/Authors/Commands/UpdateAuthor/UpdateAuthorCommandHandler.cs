@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Commands.UpdateAuthor
 {
-    public class UpdateAuthorCommandHandler : IRequestHandler<UpdateAuthorCommand, Author>
+    public class UpdateAuthorCommandHandler : IRequestHandler<UpdateAuthorCommand, OperationResult<Author>>
     {
         private readonly IGenericRepository<Author> _genericRepository;
 
@@ -20,14 +20,19 @@ namespace Application.Authors.Commands.UpdateAuthor
             _genericRepository = genericRepository;
         }
 
-        public async Task<Author> Handle(UpdateAuthorCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult<Author>> Handle(UpdateAuthorCommand request, CancellationToken cancellationToken)
         {
-            var authorToUpdate = await _genericRepository.GetByIdAsync(request.AuthorId) ?? throw new Exception("Author not found");
+            var authorToUpdate = await _genericRepository.GetByIdAsync(request.AuthorId);
+            if (authorToUpdate == null)
+            {
+                return OperationResult<Author>.FailureResult("Author not found");
+
+            }
             authorToUpdate.FirstName = request.UpdateAuthorDto.FirstName;
             authorToUpdate.LastName = request.UpdateAuthorDto.LastName;
             await _genericRepository.UpdateAsync(authorToUpdate);
-            return authorToUpdate;
-            
+            return OperationResult<Author>.SuccessResult(authorToUpdate);
+
         }
     }
 }

@@ -46,13 +46,13 @@ namespace WebApi.Controllers
         {
             try
             {
-                var user = await _mediator.Send(new AddNewUserCommand(newUser));
+                var registerUser = await _mediator.Send(new AddNewUserCommand(newUser));
 
-                if (user.IsSuccess)
+                if (registerUser.IsSuccess)
                 {
-                    return Ok(new { message = user.Message, data = user.Data });
+                    return Ok(new { message = registerUser.Message, data = registerUser.Data });
                 }
-                return BadRequest(new { message = user.Message, user.ErrorMessage });
+                return BadRequest(new { message = registerUser.Message, registerUser.ErrorMessage });
             }
             catch (Exception ex)
             {
@@ -65,12 +65,12 @@ namespace WebApi.Controllers
         {
             try
             {
-                var user = await _mediator.Send(new LoginUserQuery(userWantingtoLogin));
-                if (user.IsSuccess)
+                var loginUser = await _mediator.Send(new LoginUserQuery(userWantingtoLogin));
+                if (loginUser.IsSuccess)
                 {
-                    return Ok(new { message = user.Message, data = user.Data });
+                    return Ok(new { message = loginUser.Message, data = loginUser.Data });
                 }
-                return BadRequest(new { message = user.Message, user.ErrorMessage });
+                return BadRequest(new { message = loginUser.Message, loginUser.ErrorMessage });
             }
             catch (Exception ex)
             {

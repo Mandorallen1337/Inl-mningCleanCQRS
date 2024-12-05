@@ -36,14 +36,14 @@ namespace WebApi.Controllers
         {
             try
             {
-                var operationResult = await _mediator.Send(new GetAllAuthorsQuery());
-                if (operationResult.IsSuccess)
+                var getAllUsers = await _mediator.Send(new GetAllAuthorsQuery());
+                if (getAllUsers.IsSuccess)
                 {
-                    return Ok(new { message = operationResult.Message, data = operationResult.Data });
+                    return Ok(new { message = getAllUsers.Message, data = getAllUsers.Data });
                 }
                 else
                 {
-                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                    return BadRequest(new { message = getAllUsers.Message, getAllUsers.ErrorMessage });
                 }
             }
             catch (Exception ex)
@@ -57,14 +57,14 @@ namespace WebApi.Controllers
         {
             try
             {
-                var operationResult = await _mediator.Send(new GetAuthorByIdQuery(authorId));
-                if (operationResult.IsSuccess)
+                var getUserById = await _mediator.Send(new GetAuthorByIdQuery(authorId));
+                if (getUserById.IsSuccess)
                 {
-                    return Ok(new { message = operationResult.Message, data = operationResult.Data });
+                    return Ok(new { message = getUserById.Message, data = getUserById.Data });
                 }
                 else
                 {
-                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                    return BadRequest(new { message = getUserById.Message, getUserById.ErrorMessage });
                 }
             }
             catch (Exception ex)
@@ -83,14 +83,14 @@ namespace WebApi.Controllers
                 {
                     return BadRequest("Author data is null.");
                 }
-                var operationResult = await _mediator.Send(new CreateAuthorCommand(createAuthorDto));
-                if (operationResult.IsSuccess)
+                var createAuthor = await _mediator.Send(new CreateAuthorCommand(createAuthorDto));
+                if (createAuthor.IsSuccess)
                 {
-                    return CreatedAtAction(nameof(GetAuthorById), new { authorId = operationResult.Data.Id }, operationResult.Data);
+                    return CreatedAtAction(nameof(GetAuthorById), new { authorId = createAuthor.Data.Id }, createAuthor.Data);
                 }
                 else
                 {
-                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                    return BadRequest(new { message = createAuthor.Message, createAuthor.ErrorMessage });
                 }
             }
             catch (Exception ex)
@@ -105,14 +105,14 @@ namespace WebApi.Controllers
         {
             try
             {
-                var operationResult = await _mediator.Send(new DeleteAuthorCommand(id));
-                if (operationResult.IsSuccess)
+                var deleteAuthor = await _mediator.Send(new DeleteAuthorCommand(id));
+                if (deleteAuthor.IsSuccess)
                 {
-                    return Ok(new { message = operationResult.Message });
+                    return Ok(new { message = deleteAuthor.Message });
                 }
                 else
                 {
-                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                    return BadRequest(new { message = deleteAuthor.Message, deleteAuthor.ErrorMessage });
                 }
             }
             catch (Exception ex)
@@ -126,14 +126,14 @@ namespace WebApi.Controllers
         {
             try
             {
-                var operationResult = await _mediator.Send(new UpdateAuthorCommand(id, updateAuthorDto));
-                if (operationResult.IsSuccess)
+                var updateAuthor = await _mediator.Send(new UpdateAuthorCommand(id, updateAuthorDto));
+                if (updateAuthor.IsSuccess)
                 {
-                    return Ok(new { message = operationResult.Message });
+                    return Ok(new { message = updateAuthor.Message });
                 }
                 else
                 {
-                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                    return BadRequest(new { message = updateAuthor.Message, updateAuthor.ErrorMessage });
                 }
             }
             catch (Exception ex)

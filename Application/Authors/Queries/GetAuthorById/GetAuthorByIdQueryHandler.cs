@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Queries.GetAuthorById
 {
-    public class GetAuthorByIdQueryHandler : IRequestHandler<GetAuthorByIdQuery, Author>
+    public class GetAuthorByIdQueryHandler : IRequestHandler<GetAuthorByIdQuery, OperationResult<Author>>
     {
         private readonly IGenericRepository<Author> _genericRepository;
 
@@ -19,14 +19,16 @@ namespace Application.Authors.Queries.GetAuthorById
             _genericRepository = genericRepository;
         }
 
-        public async Task<Author> Handle(GetAuthorByIdQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<Author>> Handle(GetAuthorByIdQuery request, CancellationToken cancellationToken)
         {
             var foundAuthor = await _genericRepository.GetByIdAsync(request.AuthorId);
             if (foundAuthor == null)
             {
-                throw new Exception($"Author not found {request.AuthorId}");
+                return OperationResult<Author>.FailureResult("Author not found");
             }
-            return foundAuthor;
+            return OperationResult<Author>.SuccessResult(foundAuthor);
         }
+
+        
     }
 }

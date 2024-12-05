@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application.Users.Queries.LoginUser
 {
-    public class LoginUserqueryHandler : IRequestHandler<LoginUserQuery, string>
+    public class LoginUserqueryHandler : IRequestHandler<LoginUserQuery, OperationResult<string>>
     {
         private readonly IGenericRepository<User> _userRepository;
         private readonly TokenHelper _tokenHelper;
@@ -22,11 +22,15 @@ namespace Application.Users.Queries.LoginUser
             _tokenHelper = tokenHelper;
         }
 
-        public async Task<string> Handle(LoginUserQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<string>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.FindByAsync(u => u.UserName == request.LoginUserDto.UserName && u.Password == request.LoginUserDto.Password) ?? throw new UnauthorizedAccessException("Invalid username or password");
+            var user = await _userRepository.FindByAsync(u => u.UserName == request.LoginUserDto.UserName && u.Password == request.LoginUserDto.Password);
+            if (user == null)
+            {
+                return OperationResult<string>.FailureResult("Invalid username or password");
+            }
             string token = _tokenHelper.GenerateJwtToken(user);
-            return token;
+            return OperationResult<string>.SuccessResult(token);
         }
     
     }

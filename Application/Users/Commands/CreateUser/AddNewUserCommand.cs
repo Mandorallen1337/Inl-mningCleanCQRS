@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Users.Commands.CreateUser
 {
-    public class AddNewUserCommand : IRequest<User>
+    public class AddNewUserCommand : IRequest <OperationResult<User>>
     {
         public AddNewUserCommand(UserDto userDto)
         {

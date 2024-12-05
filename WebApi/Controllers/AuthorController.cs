@@ -36,7 +36,15 @@ namespace WebApi.Controllers
         {
             try
             {
-                return Ok(await _mediator.Send(new GetAllAuthorsQuery()));
+                var operationResult = await _mediator.Send(new GetAllAuthorsQuery());
+                if (operationResult.IsSuccess)
+                {
+                    return Ok(new { message = operationResult.Message, data = operationResult.Data });
+                }
+                else
+                {
+                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                }
             }
             catch (Exception ex)
             {
@@ -49,7 +57,15 @@ namespace WebApi.Controllers
         {
             try
             {
-                return Ok(await _mediator.Send(new GetAuthorByIdQuery(authorId)));
+                var operationResult = await _mediator.Send(new GetAuthorByIdQuery(authorId));
+                if (operationResult.IsSuccess)
+                {
+                    return Ok(new { message = operationResult.Message, data = operationResult.Data });
+                }
+                else
+                {
+                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                }
             }
             catch (Exception ex)
             {
@@ -67,8 +83,15 @@ namespace WebApi.Controllers
                 {
                     return BadRequest("Author data is null.");
                 }
-                var createdAuthor = await _mediator.Send(new CreateAuthorCommand(createAuthorDto));
-                return CreatedAtAction(nameof(GetAuthorById), new { authorId = createdAuthor.Id }, createdAuthor);
+                var operationResult = await _mediator.Send(new CreateAuthorCommand(createAuthorDto));
+                if (operationResult.IsSuccess)
+                {
+                    return CreatedAtAction(nameof(GetAuthorById), new { authorId = operationResult.Data.Id }, operationResult.Data);
+                }
+                else
+                {
+                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                }
             }
             catch (Exception ex)
             {
@@ -76,13 +99,21 @@ namespace WebApi.Controllers
             }
         }
 
-            // DELETE api/<AuthorController>/5
-            [HttpDelete("DeleteAuthor")]
+        // DELETE api/<AuthorController>/5
+        [HttpDelete("DeleteAuthor")]
         public async Task<IActionResult> DeleteAuthor(Guid id)
         {
             try
             {
-                return Ok(await _mediator.Send(new DeleteAuthorCommand(id)));
+                var operationResult = await _mediator.Send(new DeleteAuthorCommand(id));
+                if (operationResult.IsSuccess)
+                {
+                    return Ok(new { message = operationResult.Message });
+                }
+                else
+                {
+                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                }
             }
             catch (Exception ex)
             {
@@ -95,7 +126,15 @@ namespace WebApi.Controllers
         {
             try
             {
-                return Ok(await _mediator.Send(new UpdateAuthorCommand(id, updateAuthorDto)));
+                var operationResult = await _mediator.Send(new UpdateAuthorCommand(id, updateAuthorDto));
+                if (operationResult.IsSuccess)
+                {
+                    return Ok(new { message = operationResult.Message });
+                }
+                else
+                {
+                    return BadRequest(new { message = operationResult.Message, operationResult.ErrorMessage });
+                }
             }
             catch (Exception ex)
             {

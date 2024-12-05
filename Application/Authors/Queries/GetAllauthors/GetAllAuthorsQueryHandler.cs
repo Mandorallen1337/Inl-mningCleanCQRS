@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Queries.GetAllauthors
 {
-    public class GetAllAuthorsQueryHandler : IRequestHandler<GetAllAuthorsQuery, List<Author>>
+    public class GetAllAuthorsQueryHandler : IRequestHandler<GetAllAuthorsQuery, OperationResult<List<Author>>>
     {
         private readonly IGenericRepository<Author> _genericRepository;
         private readonly IMemoryCache _memoryCache;
@@ -23,15 +23,19 @@ namespace Application.Authors.Queries.GetAllauthors
             _memoryCache = memoryCache;
         }
 
-        public async Task<List<Author>> Handle(GetAllAuthorsQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<List<Author>>> Handle(GetAllAuthorsQuery request, CancellationToken cancellationToken)
         {
             if (!_memoryCache.TryGetValue(cacheKey, out List<Author> allAuthors))
             {
                 allAuthors = (await _genericRepository.GetAllAsync()).ToList();
                 _memoryCache.Set(cacheKey, allAuthors, TimeSpan.FromMinutes(5));
+                if(allAuthors.Count == 0)
+                {
+                    return OperationResult<List<Author>>.FailureResult("No authors found");
+                }
             }
             
-            return allAuthors == null ? throw new Exception("No authors found") : allAuthors.ToList();
+            return OperationResult<List<Author>>.SuccessResult(allAuthors);
         }
     }
 }

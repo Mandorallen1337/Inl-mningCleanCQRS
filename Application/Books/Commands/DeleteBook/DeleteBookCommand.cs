@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Commands.DeleteBook
 {
-    public class DeleteBookCommand : IRequest<Book>
+    public class DeleteBookCommand : IRequest <OperationResult <Book>>
     {
         public DeleteBookCommand(Guid bookId)
         {

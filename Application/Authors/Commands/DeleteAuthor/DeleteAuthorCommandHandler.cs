@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Commands.DeleteAuthor
 {
-    public class DeleteAuthorCommandHandler : IRequestHandler<DeleteAuthorCommand, Author>
+    public class DeleteAuthorCommandHandler : IRequestHandler<DeleteAuthorCommand, OperationResult<Author>>
     {
         private readonly IGenericRepository<Author> _genericRepository;
 
@@ -20,11 +20,15 @@ namespace Application.Authors.Commands.DeleteAuthor
             _genericRepository = genericRepository;
         }
 
-        public async Task<Author> Handle(DeleteAuthorCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult<Author>> Handle(DeleteAuthorCommand request, CancellationToken cancellationToken)
         {
-            Author authorToDelete = await _genericRepository.GetByIdAsync(request.AuthorId) ?? throw new NotFoundException($"Author not found {request.AuthorId}");
+            Author authorToDelete = await _genericRepository.GetByIdAsync(request.AuthorId);
+            if(authorToDelete == null)
+            {
+                return OperationResult<Author>.FailureResult("Author not found");
+            }
             await _genericRepository.DeleteAsync(authorToDelete);
-            return authorToDelete;                      
+            return OperationResult<Author>.SuccessResult(authorToDelete);                     
         }
     }
 }

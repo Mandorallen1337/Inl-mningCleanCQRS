@@ -88,15 +88,14 @@ namespace WebApi.Controllers
         public async Task<IActionResult> CreateAuthor([FromBody] CreateAuthorDto createAuthorDto)
         {
             _logger.LogInformation("Processing request to create a new author.");
-
             try
             {
-                if (createAuthorDto == null)
+                if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("CreateAuthorDto is null.");
-                    return BadRequest(new { message = "Author data cannot be null." });
+                    _logger.LogWarning("CreateAuthorDto is invalid.");
+                    return BadRequest(ModelState);
                 }
-
+                                
                 var createAuthor = await _mediator.Send(new CreateAuthorCommand(createAuthorDto));
 
                 if (createAuthor.IsSuccess)
@@ -147,6 +146,12 @@ namespace WebApi.Controllers
 
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("UpdateAuthorDto is invalid.");
+                    return BadRequest(ModelState);
+                }
+
                 var updateAuthor = await _mediator.Send(new UpdateAuthorCommand(id, updateAuthorDto));
 
                 if (updateAuthor.IsSuccess)

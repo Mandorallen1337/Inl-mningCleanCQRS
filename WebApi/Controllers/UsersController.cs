@@ -53,13 +53,12 @@ namespace WebApi.Controllers
         public async Task<IActionResult> RegisterUser([FromBody] UserDto newUser)
         {
             _logger.LogInformation("Processing request to register a new user.");
-
             try
-            {
-                if (newUser == null)
-                {
-                    _logger.LogWarning("RegisterUser: The provided user data is null.");
-                    return BadRequest(new { message = "User data cannot be null." });
+            {                
+                if (!ModelState.IsValid)
+                {                    
+                    _logger.LogWarning("RegisterUser: The provided user data is invalid.");
+                    return BadRequest(ModelState);
                 }
 
                 var registerUser = await _mediator.Send(new AddNewUserCommand(newUser));
@@ -80,17 +79,24 @@ namespace WebApi.Controllers
             }
         }
 
+
         [HttpPost("Login")]
         public async Task<IActionResult> LoginUser([FromBody] UserDto userWantingToLogin)
         {
             _logger.LogInformation("Processing request to log in a user.");
-
             try
-            {
+            {              
+
                 if (userWantingToLogin == null)
                 {
                     _logger.LogWarning("LoginUser: The provided user data is null.");
                     return BadRequest(new { message = "Login data cannot be null." });
+                }                
+
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("LoginUser: The provided user data is invalid.");
+                    return BadRequest(ModelState);
                 }
 
                 var loginUser = await _mediator.Send(new LoginUserQuery(userWantingToLogin));
@@ -113,11 +119,9 @@ namespace WebApi.Controllers
             }
         }
 
-
-
         private IActionResult HandleException(Exception ex)
-        {            
-            return StatusCode(500, new { message = "Internal server error.", error = ex.Message });
+        {       
+        return StatusCode(500, new { message = "Internal server error.", error = ex.Message });
         }
     }
 }

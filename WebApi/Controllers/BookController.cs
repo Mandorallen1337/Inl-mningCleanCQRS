@@ -84,13 +84,19 @@ namespace WebApi.Controllers
         {
             _logger.LogInformation("Processing request to create a new book.");
             try
-            {
+            {                
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("CreateBook: The provided book data is invalid.");
+                    return BadRequest(ModelState);  
+                }
+
                 var newBook = await _mediator.Send(createBookCommand);
 
                 if (newBook.IsSuccess)
                 {
                     _logger.LogInformation("Successfully created a new book with title: {BookTitle}", createBookCommand.Title);
-                    return Ok(new { message = newBook.Message, data = newBook.Data });
+                    return CreatedAtAction(nameof(GetBookById), new { id = newBook.Data?.Id }, newBook.Data);  
                 }
 
                 _logger.LogWarning("Failed to create a new book. Reason: {ErrorMessage}", newBook.ErrorMessage);
@@ -99,9 +105,10 @@ namespace WebApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating a new book.");
-                return HandleException(ex);
+                return HandleException(ex);  
             }
         }
+
 
         [HttpDelete("DeleteBook")]
         public async Task<IActionResult> DeleteBook(Guid id)
@@ -133,6 +140,12 @@ namespace WebApi.Controllers
             _logger.LogInformation("Processing request to update book with ID: {BookId}", id);
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("UpdateBook: The provided book data is invalid.");
+                    return BadRequest(ModelState);
+                }
+
                 var updateBook = await _mediator.Send(new UpdateBookCommand(id, updateBookDto));
 
                 if (updateBook.IsSuccess)

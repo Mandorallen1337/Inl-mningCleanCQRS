@@ -11,7 +11,11 @@ namespace Domain.Models
     public class Author
     {        
         public Guid Id { get; private set; }
+        [Required]
+        [MaxLength(20)]
         public string? FirstName { get; set; }
+        [Required]
+        [MaxLength(20)]
         public string? LastName { get; set; }
 
         [JsonIgnore]

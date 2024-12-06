@@ -14,6 +14,5 @@ namespace Database.Exceptions
 
         public RepositoryOperationException(string message, Exception innerException) : base(message, innerException) { }
 
-
     }
 }

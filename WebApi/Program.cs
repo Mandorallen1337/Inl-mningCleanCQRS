@@ -1,7 +1,9 @@
 using Application;
 using Application.Users.Queries.LoginUser.Helpers;
 using Database.Databases;
+using Database.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -14,6 +16,10 @@ namespace WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddScoped<IPasswordService, PasswordService>();
+            builder.Services.AddSingleton<IPasswordHasher<object>, PasswordHasher<object>>();
+
 
             // Add services to the container.
             builder.Services.AddInfrastruture(builder.Configuration.GetConnectionString("DefaultConnection")!);

@@ -1,25 +1,25 @@
 name: .NET Build and Test
 
 on:
-  push:
-    branches:
-      - main  # Trigger the workflow on pushes to the main branch
   pull_request:
-    branches:
-      - main  # Trigger on pull requests to the main branch
+      branches:
+        - development
+  
 
 jobs:
-  build:
+  run-on-dev-env:
     runs-on: ubuntu-latest  # You can change this to windows-latest if needed
+    environment: 
+      name: DEVELOPMENT  # Set the environment to Development
 
     steps:
     # Step 1: Check out the code from the repository
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     # Step 2: Set up the .NET SDK (use the appropriate version)
     - name: Set up .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'  # Set this to the .NET version you're using
 
@@ -34,6 +34,11 @@ jobs:
     # Step 5: Run tests (if you have any unit tests)
     - name: Run tests
       run: dotnet test --configuration Release
+
+
+         
+
+    
 
 
 

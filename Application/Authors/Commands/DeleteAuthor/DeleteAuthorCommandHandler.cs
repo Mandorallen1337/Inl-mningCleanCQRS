@@ -22,6 +22,7 @@ namespace Application.Authors.Commands.DeleteAuthor
 
         public async Task<OperationResult<Author>> Handle(DeleteAuthorCommand request, CancellationToken cancellationToken)
         {
+            // Check if author exists
             Author authorToDelete = await _genericRepository.GetByIdAsync(request.AuthorId);
             if(authorToDelete == null)
             {

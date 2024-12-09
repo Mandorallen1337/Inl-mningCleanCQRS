@@ -29,7 +29,7 @@ namespace Application.Authors.Queries.GetAllauthors
             {
                 allAuthors = (await _genericRepository.GetAllAsync()).ToList();
                 _memoryCache.Set(cacheKey, allAuthors, TimeSpan.FromMinutes(5));
-                if(allAuthors.Count == 0)
+                if(allAuthors.Count == 0 || allAuthors == null)
                 {
                     return OperationResult<List<Author>>.FailureResult("No authors found");
                 }
